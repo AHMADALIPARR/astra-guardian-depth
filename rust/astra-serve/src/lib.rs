@@ -7,11 +7,11 @@
 //!   * choose the recurrent loop count `r` per request (adaptive depth),
 //!   * own the CUDA kernels in `../../cuda/` through FFI.
 //!
-//! Status: written, NOT compiled here (no Rust toolchain on this host).
+//! Status: pure-Rust scheduling logic compiles and tests green
+//! (`cargo test`: 2/2 pass). CUDA FFI is feature-gated (`cuda`, off by
+//! default); the kernels themselves are not compiled here (no GPU toolchain).
 
 use std::collections::VecDeque;
-use std::os::raw::{c_float, c_int};
-use std::ffi::c_void;
 
 // ---------------------------------------------------------------------------
 // FFI to the CUDA kernels (cuda/inject_norm.cu, cuda/kv_ring.cu)
