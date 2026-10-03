@@ -75,7 +75,13 @@ __global__ void __launch_bounds__(1024, 4) inject_norm_fwd(
   #pragma unroll
   for (int off = 16; off > 0; off >>= 1)
     total += __shfl_down_sync(0xffffffff, total, off);
-  const float inv = rsqrtf(total / (float)dim + eps);
+  // CORRECTNESS: the shuffle above only completes the reduction inside warp
+  // 0, so `total` is valid solely in thread 0. Broadcast it to every thread
+  // via shared memory before use.
+  __shared__ float norm_total;
+  if (tid == 0) norm_total = total;
+  __syncthreads();
+  const float inv = rsqrtf(norm_total / (float)dim + eps);
 
   // Pass 2: normalize and write.
   if ((dim & 1) == 0) {

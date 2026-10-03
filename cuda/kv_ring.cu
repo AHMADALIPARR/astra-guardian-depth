@@ -96,6 +96,9 @@ extern "C" {
 void astra_kv_ring_write(KvRing* ring, const half* k_src, const half* v_src,
                          int seq_len, cudaStream_t stream) {
   assert((ring->d_head & 1) == 0 && "d_head must be even for half2 vectorization");
+  assert(ring->capacity >= seq_len &&
+         "capacity must cover seq_len or the ring overwrites live slots");
+  assert(seq_len > 0 && "seq_len must be positive");
   const int block = 256;
   kv_ring_write<<<ring->n_heads, block, 0, stream>>>(
       ring->k, k_src, ring->cursor, seq_len, ring->capacity, ring->d_head);
@@ -107,6 +110,11 @@ void astra_kv_ring_write(KvRing* ring, const half* k_src, const half* v_src,
 void astra_kv_ring_gather(const KvRing* ring, half* k_dst, half* v_dst,
                           int seq_len, cudaStream_t stream) {
   assert((ring->d_head & 1) == 0 && "d_head must be even for half2 vectorization");
+  assert(ring->capacity >= seq_len &&
+         "capacity must cover seq_len or the ring overwrites live slots");
+  assert(ring->cursor >= (unsigned long long)seq_len &&
+         "gather requires cursor >= seq_len (call after the matching write)");
+  assert(seq_len > 0 && "seq_len must be positive");
   const int block = 256;
   kv_ring_gather<<<ring->n_heads, block, 0, stream>>>(
       ring->k, k_dst, ring->cursor, seq_len, ring->capacity, ring->d_head);
