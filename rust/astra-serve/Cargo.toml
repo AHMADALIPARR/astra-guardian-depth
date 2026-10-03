@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+[package]
+name = "astra-serve"
+version = "0.1.0"
+edition = "2021"
+description = "Production serving layer for the Astra recurrent-depth transformer: request batching, adaptive loop-count scheduling, FFI to the CUDA kernels"
+
+[lib]
+name = "astra_serve"
+crate-type = ["cdylib", "rlib"]
