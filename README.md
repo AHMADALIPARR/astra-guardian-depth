@@ -19,6 +19,7 @@ tokens → [PRELUDE] → h₀ → [SHARED BLOCK × r, h₀ re-injected] → [COD
 | `pytorch/train.py` | Depth-beats-parameters demo | ✅ executed (CPU) |
 | `pytorch/benchmark_mamba.py` | Mamba-architecture SSM baseline (CPU) vs looped transformer | ✅ executed |
 | `harness/` | Agentic frameworks: non-lossy context (Codex Harness), consequence triage, sandbox perimeter + true benchmark suite | ✅ executed |
+| `apl/astra_agents.apl` | APL agent registry, numerical specialists, capability/budget routing, bounded-round orchestration | ✅ user-supplied, verbatim |
 | `pytorch/tests/` | 12 unit tests | ✅ 12/12 pass |
 | `cuda/` | Fused inject+norm kernel, ring KV cache | ⚠️ written, not compiled (no GPU here) |
 | `rust/astra-serve/` | Batching scheduler, adaptive-`r`, FFI to CUDA kernels | ✅ compiles, `cargo test` 2/2 pass (CUDA FFI feature-gated, off by default) |
