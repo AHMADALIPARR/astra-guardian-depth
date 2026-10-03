@@ -21,7 +21,7 @@ tokens → [PRELUDE] → h₀ → [SHARED BLOCK × r, h₀ re-injected] → [COD
 | `harness/` | Agentic frameworks: non-lossy context (Codex Harness), consequence triage, sandbox perimeter + true benchmark suite | ✅ executed |
 | `pytorch/tests/` | 12 unit tests | ✅ 12/12 pass |
 | `cuda/` | Fused inject+norm kernel, ring KV cache | ⚠️ written, not compiled (no GPU here) |
-| `rust/astra-serve/` | Batching scheduler, adaptive-`r`, FFI to CUDA kernels | ⚠️ written, not compiled (no Rust toolchain here) |
+| `rust/astra-serve/` | Batching scheduler, adaptive-`r`, FFI to CUDA kernels | ✅ compiles, `cargo test` 2/2 pass (CUDA FFI feature-gated, off by default) |
 | `docs/architecture.md` | Full architecture writeup | — |
 
 ## The loop, precisely
@@ -138,8 +138,9 @@ a module whose whole point is non-lossy persistence.
 ## Honesty record
 
 - ✅ PyTorch layer: real code, executed on CPU, tests green, training demo measured.
-- ⚠️ CUDA kernels: written against the CUDA C++ API, reviewed by reading only.
-- ⚠️ Rust crate: written, unit tests written but not run.
+- ✅ Agentic harness: real code, executed, benchmark suite measured (see table above).
+- ✅ Rust crate: pure-Rust scheduler compiles, `cargo test` 2/2 pass, zero warnings. CUDA FFI is feature-gated off.
+- ⚠️ CUDA kernels: written against the CUDA C++ API, reviewed by reading only; correctness fix applied (norm broadcast) but not compiled.
 - No performance claims are made for unexecuted code anywhere in this repo.
 
 ## License
