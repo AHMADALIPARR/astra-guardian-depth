@@ -16,6 +16,7 @@ Usage: python benchmark_mamba.py [--steps 2000]
 """
 
 import argparse
+import os
 import sys
 import time
 
@@ -49,7 +50,7 @@ def evaluate(model, n=2000, seed=0):
     out = {}
     with torch.no_grad():
         for k in (1, 2, 3, 4):
-            exact_ok, bit_ok, bit_tot = 0, 0, 0
+            exact_ok, bit_ok, bit_tot, n_done = 0, 0, 0, 0
             for _ in range(n // 256):
                 x = torch.randint(0, 2, (256, N_BITS), generator=g)
                 k_tok = torch.full((256, 1), K_TOK[k], dtype=torch.long)
@@ -61,7 +62,10 @@ def evaluate(model, n=2000, seed=0):
                 exact_ok += (pred == target).all(dim=1).sum().item()
                 bit_ok += (pred == target).sum().item()
                 bit_tot += target.numel()
-            out[k] = (exact_ok / (n), bit_ok / bit_tot)
+                n_done += x.shape[0]
+            # n_done is the actual evaluated count (n // 256 batches);
+            # dividing by n would understate exact-match.
+            out[k] = (exact_ok / n_done, bit_ok / bit_tot)
     return out
 
 
@@ -90,6 +94,12 @@ def main():
         if step % 500 == 0:
             print(f"  step {step:5d}  loss {loss.item():.4f}", flush=True)
     print(f"trained {args.steps} steps in {time.time()-t0:.1f}s (CPU)")
+
+    ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "mamba_baseline.pt")
+    torch.save({"state_dict": model.state_dict(), "steps": args.steps,
+                "seed": args.seed, "params": model.count_parameters()}, ckpt)
+    print(f"saved checkpoint to {ckpt}")
 
     # Looped-transformer baseline (train.py, per-pass eval, same task family).
     looped = {1: (0.492, 0.937), 2: (0.262, 0.875),
