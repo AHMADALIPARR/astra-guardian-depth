@@ -1,0 +1,39 @@
+{
+  "context_retrieval": {
+    "status": "ok",
+    "seconds": 0.26,
+    "non_lossy": {
+      "recall@1": 0.9931972789115646,
+      "recall@5": 1.0,
+      "exact_value": 0.9931972789115646,
+      "n_facts": 147,
+      "n_docs": 1500
+    },
+    "lossy_baseline": {
+      "recall@1": 0.23129251700680273,
+      "recall@5": 0.23129251700680273,
+      "exact_value": 0.23129251700680273,
+      "n_facts": 147,
+      "n_docs": 1500
+    },
+    "index_docs": 1500
+  },
+  "triage": {
+    "status": "ok",
+    "seconds": 0.0,
+    "accuracy": 1.0,
+    "precision_high": 1.0,
+    "recall_high": 1.0,
+    "auto_resolved": 18,
+    "parked": 18,
+    "n_cases": 36,
+    "false_negatives": 0
+  },
+  "sandbox": {
+    "status": "ok",
+    "seconds": 0.0,
+    "legit_allow_rate": 1.0,
+    "attack_block_rate": 1.0,
+    "n_attacks": 6
+  }
+}

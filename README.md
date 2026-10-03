@@ -17,6 +17,8 @@ tokens → [PRELUDE] → h₀ → [SHARED BLOCK × r, h₀ re-injected] → [COD
 |---|---|---|
 | `pytorch/astra/` | Research: `LoopedTransformer` (prelude → loop → coda), latent-loop monitors, synthetic tasks | ✅ executed (CPU) |
 | `pytorch/train.py` | Depth-beats-parameters demo | ✅ executed (CPU) |
+| `pytorch/benchmark_mamba.py` | Mamba-architecture SSM baseline (CPU) vs looped transformer | ✅ executed |
+| `harness/` | Agentic frameworks: non-lossy context (Codex Harness), consequence triage, sandbox perimeter + true benchmark suite | ✅ executed |
 | `pytorch/tests/` | 12 unit tests | ✅ 12/12 pass |
 | `cuda/` | Fused inject+norm kernel, ring KV cache | ⚠️ written, not compiled (no GPU here) |
 | `rust/astra-serve/` | Batching scheduler, adaptive-`r`, FFI to CUDA kernels | ⚠️ written, not compiled (no Rust toolchain here) |
@@ -94,6 +96,44 @@ python train.py --steps 2000       # depth-beats-parameters demo (bit rotation)
 
 CUDA: `cd cuda && nvcc -O3 -arch=sm_90 -c inject_norm.cu` (needs a GPU host).
 Rust: `cd rust/astra-serve && cargo test` (needs a Rust toolchain).
+
+## Agentic frameworks (measured)
+
+Beyond recurrent depth and latent reasoning, Astra ships three systemic
+frameworks for long-horizon autonomous agents, in `harness/`, with a true
+(executed, measured) benchmark suite (`python -m harness.benchmark`):
+
+**1. Non-lossy context persistence (Codex Harness)** — `harness/context.py`.
+Raw logs stay fully indexed in a background vector space (exact-token TF-IDF,
+no hash collisions, no summarization); structured rolling notes hold exact
+developer/environment facts. Recall returns verbatim text, never a summary.
+
+**2. Proactive disambiguation & autonomous triage** — `harness/triage.py`.
+A deterministic consequence classifier auto-resolves low-consequence decisions
+(temp naming, local paths) with operational defaults and parks
+high-consequence forks (destructive, irreversible, secret-touching,
+cross-boundary) as async clarifying questions — the agent keeps working
+parallel subtasks while waiting.
+
+**3. Perimeter verification & sandboxing** — `harness/sandbox.py`.
+Path containment (post-symlink-resolution), command allowlisting, restricted
+environment, execution timeouts. Enforcement raises; it doesn't advise.
+
+Measured `python -m harness.benchmark` (147 planted facts in 1,500 synthetic
+execution logs; 36 labeled triage cases; 6 escape attacks):
+
+| benchmark | metric | measured |
+|---|---|---|
+| context retrieval (non-lossy) | recall@1 / recall@5 / exact-value | **0.993 / 1.000 / 0.993** |
+| context retrieval (lossy baseline: keeps every 5th doc) | recall@1 | 0.231 (= fraction of docs kept — dropping data loses facts) |
+| triage classification | accuracy / precision(HIGH) / recall(HIGH) | 1.000 / 1.000 / 1.000 (18 auto-resolved, 18 parked, 0 false negatives) |
+| sandbox enforcement | legit allow rate / attack block rate | 1.000 / 1.000 (traversal, absolute-path, symlink-escape, non-allowlisted commands all blocked) |
+
+Implementation note, kept because it's instructive: the first cut used
+hashed bag-of-words embeddings and scored 0.00 recall — hash collisions let
+common tokens outvote the rare exact facts. The fix was exact-token TF-IDF
+(no hashing = no information loss), which is also the more honest design for
+a module whose whole point is non-lossy persistence.
 
 ## Honesty record
 

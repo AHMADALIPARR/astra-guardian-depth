@@ -15,44 +15,60 @@ use std::ffi::c_void;
 
 // ---------------------------------------------------------------------------
 // FFI to the CUDA kernels (cuda/inject_norm.cu, cuda/kv_ring.cu)
+//
+// Feature-gated (`cuda`): the kernels are built separately with nvcc and
+// linked in. With the feature off (default, incl. `cargo test`) this module
+// is compiled out, so the pure-Rust scheduling logic is testable without a
+// GPU toolchain.
 // ---------------------------------------------------------------------------
 
-#[repr(C)]
-pub struct KvRing {
-    pub k: *mut u16, // half*
-    pub v: *mut u16,
-    pub n_heads: c_int,
-    pub capacity: c_int,
-    pub d_head: c_int,
-    pub cursor: u64,
-}
+#[cfg(feature = "cuda")]
+mod ffi {
+    use std::os::raw::{c_float, c_int};
+    use std::ffi::c_void;
 
-pub type CudaStream = *mut c_void;
+    pub type CudaStream = *mut c_void;
 
-extern "C" {
-    fn astra_inject_norm(
-        x: *const u16, p: *const u16, w: *const u16, y: *mut u16,
-        rows: c_int, dim: c_int, scale: c_float, eps: c_float,
-        stream: CudaStream,
-    );
-    fn astra_kv_ring_write(ring: *mut KvRing, k_src: *const u16, v_src: *const u16,
-                           seq_len: c_int, stream: CudaStream);
-    fn astra_kv_ring_gather(ring: *const KvRing, k_dst: *mut u16, v_dst: *mut u16,
-                            seq_len: c_int, stream: CudaStream);
-}
+    #[repr(C)]
+    pub struct KvRing {
+        pub k: *mut u16, // half*
+        pub v: *mut u16,
+        pub n_heads: c_int,
+        pub capacity: c_int,
+        pub d_head: c_int,
+        pub cursor: u64,
+    }
 
-/// Safe wrapper: one fused prompt re-injection + norm over `rows` hidden states.
-pub fn inject_norm(x: &[u16], p: &[u16], w: &[u16], y: &mut [u16],
-                   rows: usize, dim: usize, scale: f32, stream: CudaStream) {
-    assert_eq!(x.len(), rows * dim);
-    assert_eq!(p.len(), rows * dim);
-    assert_eq!(y.len(), rows * dim);
-    assert_eq!(w.len(), dim);
-    unsafe {
-        astra_inject_norm(x.as_ptr(), p.as_ptr(), w.as_ptr(), y.as_mut_ptr(),
-                          rows as c_int, dim as c_int, scale, 1e-6, stream);
+    extern "C" {
+        pub fn astra_inject_norm(
+            x: *const u16, p: *const u16, w: *const u16, y: *mut u16,
+            rows: c_int, dim: c_int, scale: c_float, eps: c_float,
+            stream: CudaStream,
+        );
+        pub fn astra_kv_ring_write(ring: *mut KvRing, k_src: *const u16,
+                                   v_src: *const u16, seq_len: c_int,
+                                   stream: CudaStream);
+        pub fn astra_kv_ring_gather(ring: *const KvRing, k_dst: *mut u16,
+                                    v_dst: *mut u16, seq_len: c_int,
+                                    stream: CudaStream);
+    }
+
+    /// Safe wrapper: one fused prompt re-injection + norm over `rows` states.
+    pub fn inject_norm(x: &[u16], p: &[u16], w: &[u16], y: &mut [u16],
+                       rows: usize, dim: usize, scale: f32, stream: CudaStream) {
+        assert_eq!(x.len(), rows * dim);
+        assert_eq!(p.len(), rows * dim);
+        assert_eq!(y.len(), rows * dim);
+        assert_eq!(w.len(), dim);
+        unsafe {
+            astra_inject_norm(x.as_ptr(), p.as_ptr(), w.as_ptr(), y.as_mut_ptr(),
+                              rows as c_int, dim as c_int, scale, 1e-6, stream);
+        }
     }
 }
+
+#[cfg(feature = "cuda")]
+pub use ffi::{KvRing, CudaStream, inject_norm};
 
 // ---------------------------------------------------------------------------
 // Request batching with adaptive recurrent depth

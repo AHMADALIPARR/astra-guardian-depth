@@ -9,3 +9,9 @@ description = "Production serving layer for the Astra recurrent-depth transforme
 [lib]
 name = "astra_serve"
 crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+# cuda: link the kernels in ../../cuda/ (needs nvcc-built objects).
+# Off by default so `cargo test` exercises the pure-Rust logic.
+cuda = []

@@ -15,6 +15,7 @@ from .model import (
     LoopedTransformer,
     LoopTrace,
 )
+from .ssm import SelectiveSSM, MambaBlock, MambaBaseline
 
 __all__ = [
     "RMSNorm",
@@ -22,4 +23,7 @@ __all__ = [
     "TransformerBlock",
     "LoopedTransformer",
     "LoopTrace",
+    "SelectiveSSM",
+    "MambaBlock",
+    "MambaBaseline",
 ]
