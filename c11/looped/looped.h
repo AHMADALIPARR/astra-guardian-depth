@@ -38,10 +38,25 @@ typedef struct {
     float head_w[LT_VOCAB][LT_D_MODEL];
 } LoopedModel;
 
+// Cached intermediates for a single transformer block (for backward)
+typedef struct {
+    float n1[LT_MAX_T][LT_D_MODEL];
+    float qkv[LT_MAX_T][3*LT_D_MODEL];
+    float attn_out[LT_MAX_T][LT_D_MODEL];
+    float tmp[LT_MAX_T][LT_D_MODEL];
+    float n2[LT_MAX_T][LT_D_MODEL];
+    float gate_pre[LT_MAX_T][LT_D_FF];
+    float gate[LT_MAX_T][LT_D_FF];
+    float up[LT_MAX_T][LT_D_FF];
+} BlockCache;
+
 typedef struct {
     int T;
     float h0[LT_MAX_T][LT_D_MODEL];
     float h[LT_R_LOOP+1][LT_MAX_T][LT_D_MODEL]; // h[0]=prelude out, h[r]=final
+    BlockCache prelude_cache;
+    BlockCache loop_cache[LT_R_LOOP];
+    float normed_final[LT_MAX_T][LT_D_MODEL];
 } LoopedCache;
 
 void looped_init(LoopedModel *m, unsigned long long seed);
