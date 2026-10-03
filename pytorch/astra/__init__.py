@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-NON-AI-MPL-2.0
+# Copyright (C) 2026 SnapKitty Collective
 """Astra recurrent-depth transformer: prelude -> looped core (r passes) -> coda.
 
 The model reuses ONE shared Transformer block for `r` recurrent passes over the

@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-NON-AI-MPL-2.0
+# Copyright (C) 2026 SnapKitty Collective
 """Depth-beats-parameters demo: the loop learns an iterated function.
 
 Task: bit rotation. The shared block learns ONE job -- rotate right by one --

@@ -1,4 +1,5 @@
-<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- SPDX-License-Identifier: LicenseRef-NON-AI-MPL-2.0 -->
+<!-- Copyright (C) 2026 SnapKitty Collective -->
 # Astra: recurrent depth + latent reasoning
 
 A looped-transformer reference architecture. Instead of stacking dozens of
@@ -103,5 +104,5 @@ Rust: `cd rust/astra-serve && cargo test` (needs a Rust toolchain).
 
 ## License
 
-AGPL-3.0-or-later — see `LICENSE`. Every authored source file carries an
-SPDX header.
+NON-AI Mozilla Public License 2.0 — see `LICENSE`. Every authored source
+file carries an SPDX header (`LicenseRef-NON-AI-MPL-2.0`).

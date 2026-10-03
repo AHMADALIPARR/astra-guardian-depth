@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-NON-AI-MPL-2.0
+# Copyright (C) 2026 SnapKitty Collective
 """Unit tests for the looped transformer. Run: python -m pytest tests/ -q
 (or: python tests/test_looped.py for a dependency-free run)."""
 

@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-NON-AI-MPL-2.0
+# Copyright (C) 2026 SnapKitty Collective
 """Synthetic algorithmic tasks for probing recurrent depth.
 
 These tasks need multi-step computation, so they separate models by *effective

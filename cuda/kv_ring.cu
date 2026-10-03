@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: LicenseRef-NON-AI-MPL-2.0
+// Copyright (C) 2026 SnapKitty Collective
 // Ring-buffer KV cache for recurrent passes.
 //
 // In a looped transformer the SAME block runs r times over the sequence, so a
